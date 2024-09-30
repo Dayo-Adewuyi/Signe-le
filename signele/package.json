@@ -6,17 +6,35 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "preinstall": "npx npm-force-resolutions"
   },
   "dependencies": {
+    "@headlessui/react": "^2.1.8",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.5.0",
+    "buffer": "^6.0.3",
+    "framer-motion": "^11.9.0",
+    "html2canvas": "^1.4.1",
+    "lucide-react": "^0.446.0",
+    "next": "14.2.13",
+    "npm-force-resolutions": "^0.0.10",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^3.9.179",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.13"
+    "react-dropzone": "^14.2.3",
+    "react-intersection-observer": "^9.13.1",
+    "react-pdf": "^6.0.0",
+    "react-signature-canvas": "^1.0.6",
+    "react-toastify": "^10.0.5"
   },
   "devDependencies": {
+    "@types/react": "18.3.10",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.13"
+    "tailwindcss": "^3.4.1"
+  },
+  "resolutions": {
+    "pdfjs-dist": "3.9.179"
   }
 }
