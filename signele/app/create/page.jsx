@@ -1,9 +1,10 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDropzone } from "react-dropzone";
-import { useWriteContract } from "wagmi";
+import { useAlchemy } from "../AlchemyContext";
 import { FileText, User, Mail, Upload, CheckCircle } from "lucide-react";
+import { toast } from "react-toastify";
 
 const CreateSignature = () => {
   const [formData, setFormData] = useState({
@@ -11,27 +12,34 @@ const CreateSignature = () => {
     description: "",
     signerAddresses: [],
     emails: [],
-    files: [],
+    files: "",
   });
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentAddress, setCurrentAddress] = useState("");
   const [currentEmail, setCurrentEmail] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
       setFormData((prev) => ({ ...prev, files: acceptedFiles }));
     },
   });
+  const { createDocument, uploadFile } = useAlchemy();
 
-  const { write, isLoading, isSuccess } = useWriteContract();
+  const handleSubmit = async () => {
+    console.log(formData);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    const file = await uploadFile( formData.files );
+    
     setIsSubmitting(true);
+    setIsLoading(true);
     setTimeout(() => {
-      write?.();
+      createDocument(formData.title, formData.description, file.data.Hash, formData.signerAddresses, formData.emails);
       setIsSubmitting(false);
+      setIsSuccess(true);
     }, 2000);
+    toast.success("Signature request created successfully!");
   };
 
   const steps = [
@@ -289,10 +297,12 @@ const CreateSignature = () => {
               </motion.button>
             )}
             <motion.button
-              type={currentStep === steps.length - 1 ? "submit" : "button"}
+              type="button" // Keep type as "button" to prevent premature form submission
               onClick={() => {
                 if (currentStep < steps.length - 1) {
-                  setCurrentStep((prev) => prev + 1);
+                  setCurrentStep((prev) => prev + 1); // Move to the next step
+                } else {
+                  handleSubmit(); // Submit the form when the last step is reached
                 }
               }}
               className={`bg-blue-600 text-white py-3 px-6 rounded-lg text-lg ${
