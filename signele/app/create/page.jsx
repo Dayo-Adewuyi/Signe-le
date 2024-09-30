@@ -1,10 +1,11 @@
 "use client";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDropzone } from "react-dropzone";
 import { useAlchemy } from "../AlchemyContext";
 import { FileText, User, Mail, Upload, CheckCircle } from "lucide-react";
 import { toast } from "react-toastify";
+import { useRouter } from 'next/navigation';
 
 const CreateSignature = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +21,8 @@ const CreateSignature = () => {
   const [currentEmail, setCurrentEmail] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
       setFormData((prev) => ({ ...prev, files: acceptedFiles }));
@@ -29,7 +32,6 @@ const CreateSignature = () => {
 
   const handleSubmit = async () => {
     console.log(formData);
-
     const file = await uploadFile( formData.files );
     
     setIsSubmitting(true);
@@ -38,6 +40,9 @@ const CreateSignature = () => {
       createDocument(formData.title, formData.description, file.data.Hash, formData.signerAddresses, formData.emails);
       setIsSubmitting(false);
       setIsSuccess(true);
+      setTimeout(() => {
+        router.push("/");
+      }, 3000);
     }, 2000);
     toast.success("Signature request created successfully!");
   };

@@ -53,7 +53,7 @@ export const AlchemyProvider = ({ children }) => {
   const [documentSignatures, setDocumentSignatures] = useState({});
   const [notifications, setNotifications] = useState([]);
   const { address } = useAccount();
-  console.log(address);
+  
   useEffect(() => {
     const alchemyInstance = new Alchemy({
       apiKey: "TkpefVTlzoyLYtvxhPzKZtwdB1ks0ef9",
@@ -76,12 +76,12 @@ export const AlchemyProvider = ({ children }) => {
       }
 
       if (alchemy) {
-        const logs = await alchemy.core.getLogs({
-          address: CONTRACT_ADDRESS,
-          topics: [eventSignatures[eventType]],
-          fromBlock,
-          toBlock,
-        });
+        // const logs = await alchemy.core.getLogs({
+        //   address: CONTRACT_ADDRESS,
+        //   topics: [eventSignatures[eventType]],
+        //   fromBlock,
+        //   toBlock,
+        // });
 
         // const provider = new ethers.AlchemyProvider(
         //   Network.SCROLL_SEPOLIA,
@@ -210,6 +210,39 @@ export const AlchemyProvider = ({ children }) => {
     }
   };
 
+  async function fetchAllDocuments() {
+    
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = provider.getSigner();
+  
+
+    const signeleContract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
+  
+    try {
+      
+      const documents = await Promise.all(
+        [...Array(5)].map(async (_, index) => {
+          const document = await signeleContract.getDocument(index);
+          return {
+            documentId: index,
+            title: document.title,
+            description: document.description,
+            fileHash: document.fileHash,
+            signers: document.signers,
+            creator: document.creator,
+            completed: document.completed
+          };
+        })
+      );
+  
+      return documents;
+    } catch (error) {
+      console.error("Error fetching all documents: ", error);
+      return [];
+    }
+  }
+  
+
   useEffect(() => {
     if (address) {
       fetchSigneleEvents("DocumentCreated");
@@ -289,6 +322,8 @@ export const AlchemyProvider = ({ children }) => {
         documentSignatures,
         notifications,
         fetchSigneleEvents,
+        fetchAllDocuments,
+        address
       }}
     >
       {children}
